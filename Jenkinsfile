@@ -1,35 +1,28 @@
 pipeline {
     agent any
+    
     stages {
      
         stage('Maven Build') {
-            when {
-                branch 'develop'
             steps {
-                sh 'mvn clean package'
+                sh "mvn clean package"
             }
         }
-        stage('Tomcat Deploy-Dev') {
-            when {
-                branch 'develop'
-            }
+        stage('Docker Build') {
             steps {
-                sshagent(['tomcat-creds']) {
-                   echo "Deploying to dev"
-                }
+                sh "docker build -t keethisaddala/pipeline:0.0.2 ."
             }
         }
-             stage('Tomcat Deploy-prod') {
-            when {
-                branch 'main'
+        stage('Docker push') {
+             steps {
+                sh "docker login -u keethisaddala -p xxxxxxx"
+                sh "docker push keethisaddala/pipeline:0.0.2"
             }
-            steps {
-                echo "Deploying to production"
+        }
+    }
+}
+    
+   
                     
-                }
-            }
-        }
-    }
-}
-    }
-}
+           
+  
